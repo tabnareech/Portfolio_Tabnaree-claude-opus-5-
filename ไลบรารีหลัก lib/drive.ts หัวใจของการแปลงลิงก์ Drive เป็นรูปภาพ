@@ -1,0 +1,29 @@
+/**
+ * แปลงลิงก์แชร์จาก Google Drive ให้เป็น URL รูปภาพที่แสดงผลได้จริง
+ * รองรับ: .../file/d/<ID>/view, ...open?id=<ID>, ...uc?id=<ID>, ใส่ ID เปล่าๆ, หรือ URL รูปทั่วไป
+ * หมายเหตุ: ไฟล์ใน Drive ต้องตั้งแชร์เป็น "ทุกคนที่มีลิงก์ - ผู้อ่าน"
+ */
+export function driveId(input: string): string | null {
+  const s = (input || '').trim()
+  if (!s) return null
+  const patterns = [/\/file\/d\/([\w-]{20,})/, /[?&]id=([\w-]{20,})/, /\/d\/([\w-]{20,})/]
+  for (const p of patterns) {
+    const m = s.match(p)
+    if (m) return m[1]
+  }
+  if (/^[\w-]{20,}$/.test(s)) return s
+  return null
+}
+
+export function imageUrl(ref: string, size = 1600): string {
+  const s = (ref || '').trim()
+  if (!s) return ''
+  const id = driveId(s)
+  if (id) return `https://lh3.googleusercontent.com/d/${id}=w${size}`
+  if (/^https?:\/\//i.test(s)) return s
+  return ''
+}
+
+export function thumbUrl(ref: string): string {
+  return imageUrl(ref, 400)
+}
