@@ -1,0 +1,10 @@
+# 1. ติดตั้ง
+npm install
+
+# 2. สร้างฐานข้อมูล (Neon / Supabase / Postgres ในเครื่อง)
+#    แล้วรันไฟล์ db/schema.sql ใน SQL Editor
+
+# 3. ใส่ค่าใน .env.local (DATABASE_URL, ADMIN_USER, ADMIN_PASSWORD, SESSION_SECRET)
+
+# 4. รัน
+npm run dev      # เปิด http://localhost:3000
