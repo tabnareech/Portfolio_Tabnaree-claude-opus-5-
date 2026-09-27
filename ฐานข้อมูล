@@ -1,0 +1,64 @@
+-- ตารางโปรไฟล์เจ้าของเว็บ (มีแถวเดียว)
+CREATE TABLE IF NOT EXISTS profile (
+  id           SMALLINT PRIMARY KEY DEFAULT 1,
+  full_name    TEXT NOT NULL DEFAULT 'ชื่อ-นามสกุล',
+  position     TEXT NOT NULL DEFAULT 'นักวิชาการศึกษา',
+  org          TEXT NOT NULL DEFAULT 'หน่วยงาน',
+  email        TEXT DEFAULT '',
+  phone        TEXT DEFAULT '',
+  about        TEXT DEFAULT '',
+  photo_ref    TEXT DEFAULT '',
+  CONSTRAINT one_row CHECK (id = 1)
+);
+
+-- หมวดหมู่ภาระงาน
+CREATE TABLE IF NOT EXISTS categories (
+  id          SERIAL PRIMARY KEY,
+  code        TEXT NOT NULL,
+  name        TEXT NOT NULL,
+  color       TEXT NOT NULL DEFAULT '#2563eb',
+  sort_order  INT  NOT NULL DEFAULT 0
+);
+
+-- ผลงาน / โครงการ
+CREATE TABLE IF NOT EXISTS works (
+  id            SERIAL PRIMARY KEY,
+  title         TEXT NOT NULL,
+  category_id   INT REFERENCES categories(id) ON DELETE SET NULL,
+  fiscal_year   INT NOT NULL,
+  round         SMALLINT NOT NULL DEFAULT 1,
+  summary       TEXT DEFAULT '',
+  rationale     TEXT DEFAULT '',
+  method        TEXT DEFAULT '',
+  outcome       TEXT DEFAULT '',
+  target_qty    TEXT DEFAULT '',
+  target_qual   TEXT DEFAULT '',
+  doc_url       TEXT DEFAULT '',
+  cover_ref     TEXT DEFAULT '',
+  status        TEXT NOT NULL DEFAULT 'draft',
+  is_hidden     BOOLEAN NOT NULL DEFAULT FALSE,
+  view_count    INT NOT NULL DEFAULT 0,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_works_year ON works(fiscal_year DESC, id DESC);
+
+-- รูปภาพประกอบผลงาน (ลิงก์จาก Google Drive)
+CREATE TABLE IF NOT EXISTS work_images (
+  id          SERIAL PRIMARY KEY,
+  work_id     INT NOT NULL REFERENCES works(id) ON DELETE CASCADE,
+  image_ref   TEXT NOT NULL,
+  caption     TEXT DEFAULT '',
+  sort_order  INT NOT NULL DEFAULT 0
+);
+
+-- ข้อมูลเริ่มต้น
+INSERT INTO profile (id) VALUES (1) ON CONFLICT DO NOTHING;
+
+INSERT INTO categories (code, name, color, sort_order) VALUES
+  ('01', 'งานส่งเสริมและพัฒนาหลักสูตร', '#2563eb', 1),
+  ('02', 'งานวัดผลและประเมินผลการศึกษา', '#059669', 2),
+  ('03', 'งานโครงการและกิจกรรมพัฒนาผู้เรียน', '#d97706', 3),
+  ('04', 'งานนิเทศ ติดตามและรายงานผล', '#7c3aed', 4),
+  ('05', 'งานธุรการและงานที่ได้รับมอบหมาย', '#db2777', 5)
+ON CONFLICT DO NOTHING;
